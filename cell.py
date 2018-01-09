@@ -9,9 +9,12 @@ class Cell:
             #Index of list represents corresponding number offset by 1, because 0 indexed.
             #When it's found that cell cannot be a certain number, change corresponding index to false.
             self.values = [True,True,True,True,True,True,True,True,True]
+            self.num = None
         else: # otherwise cell is known
             self.isKnown = True
             self.num = num
+            self.values = [False,False,False,False,False,False,False,False,False]
+            self.values[num - 1] = True
 
     # check if cell has only one valid value, in which case it becomes a known cell
     # if one valid value found, return the valid number, otherwise returns 0
@@ -19,7 +22,7 @@ class Cell:
         numberOfValidValues = 0
         indexOfLastValidValue = -1
         for x in range(0,9):
-            if values[x] == True:
+            if self.values[x] == True:
                 numberOfValidValues += 1
                 indexOfLastValidValue = x
         if numberOfValidValues == 1:
