@@ -28,13 +28,51 @@ class Sudoku:
             puzzle.append(self.changeInputToList(row))
         return puzzle
 
-    # before solving, go through given known values and update adjacent
+    # checks if current instance of board is valid. E.G. no 2 of same number in one row, col, 3x3 grid.
+    def isBoardValid(self):
+        isValid = True
+        # iterate through row and col 1-9
+        for num in range(9):
+            if not self.isRowValid(num) or not self.isColumnValid(num):
+                isValid = False
+
+        # iterate through each grid
+        for row in range(0,9,3):
+            for col in range(0,9,3):
+                if not self.isGridValid(row,col):
+                    isValid = False
+        return isValid
+
+    def isThereNoPossibleCandidates(self):
+        noPossibleCandidates = False
+
+        for row in range(9):
+            for col in range(9):
+                if not self.puzzle[row][col].isKnown:
+                    if self.puzzle[row][col].values == [False,False,False,False,False,False,False,False,False]:
+                        noPossibleCandidates = True
+        return noPossibleCandidates
+
+    # before solving, go through given known values and update adjacent. Also checks for the condition of insufficient givens
     def firstPass(self):
         for row in range(9):
             for col in range(9):
                 currentCell = self.puzzle[row][col]
                 if currentCell.isKnown:
                     self.visitCell(row,col,currentCell)
+
+        if self.knownSquares < 17:
+            print "Cannot solve puzzle. Insufficient givens. Puzzle must start with at least 17 known values for it to have one unique solution."
+            self.printPuzzle()
+            sys.exit(0)
+        if not self.isBoardValid():
+            print "Cannot solve puzzle. Duplicate given. Either a row, column, or grid has 2 of the same value."
+            self.printPuzzle()
+            sys.exit(0)
+        if self.isThereNoPossibleCandidates():
+            print "Cannot solve puzzle. At least one cell has no possible candidates."
+            self.printPuzzle()
+            sys.exit(0)
 
     # visit the cell and update adjacent row, col, and 3x3 block cells
     def visitCell(self,row,col,cell):
@@ -78,6 +116,27 @@ class Sudoku:
                     # if yes then remove it from the list of possibilities
                     self.puzzle[firstRowOfBlock + row][firstColOfBlock + col].values[value - 1] = False
 
+    # # counts how many of each value are valid in a given row
+    # # for example: if a 4 is valid in only one space in the row, then we can place a 4 in that space
+    # def countRowValidValues(self,row):
+    #     validValueCount = [0,0,0,0,0,0,0,0,0]
+    #     for col in range(9):
+    #         currentCell = self.puzzle[row][col]
+    #         # only need to check not known cells
+    #         if not currentCell.isKnown:
+    #             # loop through each index in the list
+    #             for value in range(9):
+    #                 if currentCell.values[value] == True:
+    #                     validValueCount[value] += 1
+    #
+    #     for count in validValueCount:
+    #         # if only one cell in the row can be that value, then we can be certain that cell contains that value
+    #         if count == 1:
+    #             currentCell.setCellToKnown(validValue)
+    #             self.visitCell(row,col,currentCell)
+
+
+
     def solve(self):
 
         while(self.knownSquares < 81):
@@ -93,14 +152,91 @@ class Sudoku:
                             currentCell.setCellToKnown(validValue)
                             self.visitCell(row,col,currentCell)
                             puzzleUpdated = True
-            self.printPuzzle()
             if puzzleUpdated == False:
+                print "Need to use recursive backtracking. Puzzle so far:"
                 self.printPuzzle()
-                print "Puzzle is invalid!"
-                sys.exit(0)
+                self.recursiveBacktrack()
+                return
+            else:
+                print "Solving in progress"
+                self.printPuzzle()
 
-        print "Puzzle is solved"
+    def recursiveBacktrack(self):
+        if self.isBoardValid():
+            emptyIndex = self.findFirstUnknownIndex()
+            indexRow = emptyIndex[0]
+            indexCol = emptyIndex[1]
+            if indexRow == -1 and indexCol == -1:
+                return True
 
+            for value in range(1,10):
+                if self.puzzle[indexRow][indexCol].values[value - 1] == True:
+                    self.puzzle[indexRow][indexCol].setCellToKnown(value)
+                else:
+                    continue
+                if self.recursiveBacktrack():
+                    return True
+                self.puzzle[indexRow][indexCol].setCellToUnknown()
+        return False
+
+    # checks if a specific row is valid
+    def isRowValid(self,row):
+        numberCount = [0,0,0,0,0,0,0,0,0]
+
+        # iterate through each row and count occurances of each number 1-9
+        for col in range(9):
+            if self.puzzle[row][col].isKnown:
+                numberCount[self.puzzle[row][col].num - 1] += 1
+
+        # if there is more than one occurance of a number 1-9, the board is invalid
+        for count in numberCount:
+            if count > 1:
+                return False
+        # otherwise the board is valid
+        return True
+
+    # checks if a specific column is valid
+    def isColumnValid(self,col):
+        numberCount = [0,0,0,0,0,0,0,0,0]
+
+        # iterate through each row and count occurances of each number 1-9
+        for row in range(9):
+            if self.puzzle[row][col].isKnown:
+                numberCount[self.puzzle[row][col].num - 1] += 1
+
+        # if there is more than one occurance of a number 1-9, the board is invalid
+        for count in numberCount:
+            if count > 1:
+                return False
+        # otherwise the board is valid
+        return True
+
+    # checks if a specific 3x3 grid is valid. row, col passed in are the index of the top left cell of the grid
+    def isGridValid(self,startRow,startCol):
+        numberCount = [0,0,0,0,0,0,0,0,0]
+
+        # iterate through each row and count occurances of each number 1-9
+        for row in range(3):
+            for col in range(3):
+                if self.puzzle[startRow + row][startCol + col].isKnown:
+                    numberCount[self.puzzle[startRow + row][startCol + col].num - 1] += 1
+
+        # if there is more than one occurance of a number 1-9, the board is invalid
+        for count in numberCount:
+            if count > 1:
+                return False
+        # otherwise the board is valid
+        return True
+
+    # iterate through the board to find index of first unknown cell
+    def findFirstUnknownIndex(self):
+        index = [-1,-1]
+        for row in range(9):
+            for col in range(9):
+                if not self.puzzle[row][col].isKnown:
+                    index[0] = row
+                    index[1] = col
+        return index
 
     # prints the current state of the puzzle
     def printPuzzle(self):
@@ -116,7 +252,7 @@ class Sudoku:
                 if self.puzzle[row][col].isKnown:
                     print self.puzzle[row][col].num,
                 else:
-                    print '-',
+                    print '.',
                 # each 3rd column, add a vertical border
                 colCounter += 1
                 if colCounter == 3:

@@ -35,6 +35,11 @@ class Cell:
         self.isKnown = True
         self.num = num
 
+    # using recursive backtrack, need method to return a cell to its unknown state
+    def setCellToUnknown(self):
+        self.isKnown = False
+        self.num = None
+
     # override = operator to check equality based on cell's known value
     # if the value of either cell is not known, then False is returned
     def __eq__(self, other):
