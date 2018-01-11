@@ -43,6 +43,7 @@ class Sudoku:
                     isValid = False
         return isValid
 
+    # check for condition where one cell cannot be occupied by any number due to invalid board setup
     def isThereNoPossibleCandidates(self):
         noPossibleCandidates = False
 
@@ -115,27 +116,6 @@ class Sudoku:
                 if not isCellKnown and  isValueAPossibility:
                     # if yes then remove it from the list of possibilities
                     self.puzzle[firstRowOfBlock + row][firstColOfBlock + col].values[value - 1] = False
-
-    # # counts how many of each value are valid in a given row
-    # # for example: if a 4 is valid in only one space in the row, then we can place a 4 in that space
-    # def countRowValidValues(self,row):
-    #     validValueCount = [0,0,0,0,0,0,0,0,0]
-    #     for col in range(9):
-    #         currentCell = self.puzzle[row][col]
-    #         # only need to check not known cells
-    #         if not currentCell.isKnown:
-    #             # loop through each index in the list
-    #             for value in range(9):
-    #                 if currentCell.values[value] == True:
-    #                     validValueCount[value] += 1
-    #
-    #     for count in validValueCount:
-    #         # if only one cell in the row can be that value, then we can be certain that cell contains that value
-    #         if count == 1:
-    #             currentCell.setCellToKnown(validValue)
-    #             self.visitCell(row,col,currentCell)
-
-
 
     def solve(self):
 
