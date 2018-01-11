@@ -40,36 +40,29 @@ class Sudoku:
     def visitCell(self,row,col,cell):
         self.knownSquares += 1
         self.updateSameRow(row,cell.num)
-        self.updateSameColumn(row,cell.num)
+        self.updateSameColumn(col,cell.num)
         self.updateSameBlock(row,col,cell.num)
 
     # given a known value, remove that value from the list of possibilities for all cells in that row
     def updateSameRow(self,row,value):
-        valueUpdated = False
         for col in range(9):
             isCellKnown = self.puzzle[row][col].isKnown
             isValueAPossibility = self.puzzle[row][col].values[value - 1]
             if not isCellKnown and isValueAPossibility:
                 # if yes then remove it from the list of possibilities
-                isCellKnown = False
-                valueUpdated = True
-        return valueUpdated
+                self.puzzle[row][col].values[value - 1] = False
 
     # given a known value, remove that value from the list of possibilities for all cells in that column
     def updateSameColumn(self,col,value):
-        valueUpdated = False
         for row in range(9):
             isCellKnown = self.puzzle[row][col].isKnown
             isValueAPossibility = self.puzzle[row][col].values[value - 1]
             if not isCellKnown and isValueAPossibility:
                 # if yes then remove it from the list of possibilities
-                isCellKnown = False
-                valueUpdated = True
-        return valueUpdated
+                self.puzzle[row][col].values[value - 1] = False
 
     # given a known value, remove that value from the list of possibilities for all cells in that 3x3 block
     def updateSameBlock(self,row,col,value):
-        valueUpdated = False
         # first determine which 3x3 block the cell belongs to
         # we do this by finding the upper left cell of the belonging block
         # math involved: row,col = row - row % 3, col - col % 3
@@ -83,8 +76,7 @@ class Sudoku:
                 isValueAPossibility = self.puzzle[firstRowOfBlock + row][firstColOfBlock + col].values[value - 1]
                 if not isCellKnown and  isValueAPossibility:
                     # if yes then remove it from the list of possibilities
-                    isCellKnown = False
-                    valueUpdated = True
+                    self.puzzle[firstRowOfBlock + row][firstColOfBlock + col].values[value - 1] = False
 
     def solve(self):
 
@@ -98,14 +90,14 @@ class Sudoku:
                         validValue = currentCell.checkIfOneValidValue()
                         # if there exists one valid value in the cell
                         if validValue != 0:
-                            currentCell.setCellToKnown(oneValidValue)
+                            currentCell.setCellToKnown(validValue)
                             self.visitCell(row,col,currentCell)
+                            puzzleUpdated = True
             self.printPuzzle()
-                            # puzzleUpdated = True
-            # if puzzleUpdated == False:
-                # self.printPuzzle()
-                # print "Puzzle is invalid!"
-                # sys.exit(0)
+            if puzzleUpdated == False:
+                self.printPuzzle()
+                print "Puzzle is invalid!"
+                sys.exit(0)
 
         print "Puzzle is solved"
 
@@ -139,3 +131,12 @@ class Sudoku:
                 print "+-------+-------+-------+"
                 rowCounter = 0
         # no lower border needed because of rowCounter border
+
+    # for debugging purposes
+    def printPossibilities(self):
+        for row in range(9):
+            for col in range(9):
+                if self.puzzle[row][col].isKnown:
+                    print "(" + str(row) + "," + str(col) + ") Known: " + str(self.puzzle[row][col].num)
+                else:
+                    print "(" + str(row) + "," + str(col) + ") " + str(self.puzzle[row][col].values)
