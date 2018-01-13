@@ -39,10 +39,3 @@ class Cell:
     def setCellToUnknown(self):
         self.isKnown = False
         self.num = None
-    #
-    # # override = operator to check equality based on cell's known value
-    # # if the value of either cell is not known, then False is returned
-    # def __eq__(self, other):
-    #     if type(self) == type(other) and self.isKnown == True and other.isKnown == True:
-    #         return self.num == other.num
-    #     return False
