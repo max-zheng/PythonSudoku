@@ -47,13 +47,14 @@ class Interface(wx.Frame):
         self.Show()
         self.Centre()
 
-        self.puzzle = None
+        self.sudoku = None
 
     # when solve is pressed, populate backend grid using user given values
     def onButton(self,event):
-        self.puzzle = Sudoku(self.createPuzzleFromGrid())
-        self.puzzle.printPuzzle()
-        self.puzzle.solve()
+        self.sudoku = Sudoku(self.createPuzzleFromGrid())
+        self.sudoku.printPuzzle()
+        self.sudoku.solve()
+        self.populateGridUsingPuzzle()
 
     # checks if cell string is a digit from 1-9
     def isIntegerExcludingZero(self,str):
@@ -70,9 +71,10 @@ class Interface(wx.Frame):
             firstThreeRows = []
             for block in range(0,3):
                 for square in range(0 + squareCounter,3 + squareCounter):
-                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow().GetValue()
-                    if self.isIntegerExcludingZero(number):
-                        firstThreeRows.append(Cell(int(number)))
+                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow()
+                    if self.isIntegerExcludingZero(number.GetValue()):
+                        number.SetForegroundColour(wx.BLUE)
+                        firstThreeRows.append(Cell(int(number.GetValue())))
                     else:
                         firstThreeRows.append(Cell())
             puzzle.append(firstThreeRows)
@@ -82,9 +84,10 @@ class Interface(wx.Frame):
             secondThreeRows = []
             for block in range(3,6):
                 for square in range(0 + squareCounter,3 + squareCounter):
-                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow().GetValue()
-                    if self.isIntegerExcludingZero(number):
-                        secondThreeRows.append(Cell(int(number)))
+                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow()
+                    if self.isIntegerExcludingZero(number.GetValue()):
+                        number.SetForegroundColour(wx.BLUE)
+                        secondThreeRows.append(Cell(int(number.GetValue())))
                     else:
                         secondThreeRows.append(Cell())
             puzzle.append(secondThreeRows)
@@ -94,16 +97,55 @@ class Interface(wx.Frame):
             lastThreeRows = []
             for block in range(6,9):
                 for square in range(0 + squareCounter,3 + squareCounter):
-                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow().GetValue()
-                    if self.isIntegerExcludingZero(number):
-                        lastThreeRows.append(Cell(int(number)))
+                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow()
+                    if self.isIntegerExcludingZero(number.GetValue()):
+                        number.SetForegroundColour(wx.BLUE)
+                        lastThreeRows.append(Cell(int(number.GetValue())))
                     else:
                         lastThreeRows.append(Cell())
             puzzle.append(lastThreeRows)
         return puzzle
 
-    
+    # using the backend sudoku puzzle, populate the GUI grid
+    def populateGridUsingPuzzle(self):
 
+        blocks = self.size.GetChildren()[1].GetWindow().sz.GetChildren()
+
+        sudokuRow = 0
+        sudokuCol = 0
+        for squareCounter in range(0,9,3):
+            for block in range(0,3):
+                for square in range(0 + squareCounter,3 + squareCounter):
+                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow()
+                    number.SetValue(str(self.sudoku.puzzle[sudokuRow][sudokuCol].num))
+                    number.SetEditable(False)
+                    sudokuCol += 1
+            # reached end of col, need to reset col and increment row
+            sudokuCol = 0
+            sudokuRow += 1
+
+        for squareCounter in range(0,9,3):
+            for block in range(3,6):
+                for square in range(0 + squareCounter,3 + squareCounter):
+                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow()
+                    number.SetValue(str(self.sudoku.puzzle[sudokuRow][sudokuCol].num))
+                    number.SetEditable(False)
+                    sudokuCol += 1
+            # reached end of col, need to reset col and increment row
+            sudokuCol = 0
+            sudokuRow += 1
+
+        for squareCounter in range(0,9,3):
+            for block in range(6,9):
+                for square in range(0 + squareCounter,3 + squareCounter):
+                    number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow()
+                    number.SetValue(str(self.sudoku.puzzle[sudokuRow][sudokuCol].num))
+                    number.SetEditable(False)
+                    sudokuCol += 1
+
+            # reached end of col, need to reset col and increment row
+            sudokuCol = 0
+            sudokuRow += 1
 
 if  __name__    ==  "__main__":
     a   =   wx.App(redirect=False)
