@@ -4,8 +4,14 @@ from cell import Cell
 class Sudoku:
 
     # initialize a sudoku puzzle based on a 2D array which is passed in
-    def __init__(self):
-        self.puzzle = self.constructPuzzle()
+    def __init__(self,puzzle=None):
+        # if no preexisting puzzle is passed in (console case)
+        if puzzle is None:
+            print "puzzle not provided"
+            self.puzzle = self.constructPuzzle()
+        # GUI case where puzzle is passed in
+        else:
+            self.puzzle = puzzle
         self.knownSquares = 0
 
     # constructs the puzzle which is a 2D array by prompting user for each row
