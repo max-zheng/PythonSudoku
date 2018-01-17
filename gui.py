@@ -1,5 +1,3 @@
-# help from https://stackoverflow.com/questions/11571905/how-to-make-a-grid-in-wxpython
-
 import  wx
 from sudoku import Sudoku
 from cell import Cell
@@ -36,13 +34,13 @@ class Interface(wx.Frame):
         button = wx.Button(self,label="Solve")
         button.Bind(wx.EVT_BUTTON, self.onButton)
         grid = SudokuGrid(self)
-        textValue = "Please fill in the givens"
-        textbox = wx.TextCtrl(self,value=textValue,style=wx.TE_READONLY | wx.TE_MULTILINE | wx.TE_CENTRE)
+        textValue = "\n\nPlease fill in the givens"
+        textbox = wx.TextCtrl(self,value=textValue,style=wx.TE_READONLY | wx.TE_MULTILINE | wx.ALIGN_CENTER)
 
         self.size = wx.BoxSizer(wx.VERTICAL)
-        self.size.Add(button,0,wx.GROW)
-        self.size.Add(grid,3,wx.GROW)
-        self.size.Add(textbox,0,wx.GROW)
+        self.size.Add(button,1,wx.GROW)
+        self.size.Add(grid,10,wx.GROW)
+        self.size.Add(textbox,3,wx.GROW)
         self.SetSizer(self.size)
         self.Show()
         self.Centre()
@@ -63,7 +61,7 @@ class Interface(wx.Frame):
                 # change button label to "Solve another puzzle"
                 self.size.GetChildren()[0].GetWindow().SetLabel("Solve another puzzle?")
             else:
-                self.size.GetChildren()[2].GetWindow().SetValue(errorMessage)
+                self.size.GetChildren()[2].GetWindow().SetValue("\n\n" + errorMessage)
         # else if it says "Solve another puzzle?"
         else:
             self.resetGrid()
