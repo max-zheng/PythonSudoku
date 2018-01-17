@@ -4,29 +4,26 @@ import  wx
 from sudoku import Sudoku
 from cell import Cell
 
-# class Cell(wx.Panel): #cell
-#     def __init__(self,parent,id,str_val):
-#         wx.Panel.__init__(self,parent,id,style=wx.SIMPLE_BORDER)
-#         self.size = wx.BoxSizer()
-#         self.size.Add(wx.TextCtrl(self,-1,str_val),0,wx.EXPAND)
-#         self.SetSizer(self.size)
+# 3x3 grid each consisting of 9 cells
+class Block(wx.Panel):
 
-class Block(wx.Panel): # grid
-    """docstring for ."""
     def __init__(self, parent):
         wx.Panel.__init__(self,parent,style=wx.BORDER_RAISED)
         self.size = wx.GridSizer(3,3,0,0)
         for i in range(9):
-            textbox = wx.TextCtrl(self,style=wx.TE_CENTER)
-            textbox.SetMaxLength(1)
-            self.size.Add(textbox,0,wx.GROW)
+            cell = wx.TextCtrl(self,style=wx.TE_CENTER)
+            # only want to have one digit per cell
+            cell.SetMaxLength(1)
+            self.size.Add(cell,0,wx.GROW)
 
         self.SetSizer(self.size)
 
+# the entire 9x9 sudoku puzzle
 class SudokuGrid(wx.Panel):
-    def __init__(self,parent):
 
+    def __init__(self,parent):
         wx.Panel.__init__(self,parent)
+        # 3x3 sizer of 3x3 grids
         self.sz = wx.GridSizer(3,3,0,0)
         for i in range(9):
             self.sz.Add(Block(self),0,wx.GROW)
@@ -41,6 +38,7 @@ class Interface(wx.Frame):
         grid = SudokuGrid(self)
         textValue = "Please fill in the givens"
         textbox = wx.TextCtrl(self,value=textValue,style=wx.TE_READONLY | wx.TE_MULTILINE | wx.TE_CENTRE)
+
         self.size = wx.BoxSizer(wx.VERTICAL)
         self.size.Add(button,0,wx.GROW)
         self.size.Add(grid,3,wx.GROW)
@@ -51,13 +49,17 @@ class Interface(wx.Frame):
 
         self.puzzle = None
 
+    # when solve is pressed, populate backend grid using user given values
     def onButton(self,event):
         self.puzzle = Sudoku(self.createPuzzleFromGrid())
         self.puzzle.printPuzzle()
+        self.puzzle.solve()
 
+    # checks if cell string is a digit from 1-9
     def isIntegerExcludingZero(self,str):
-        return len(str) == 1 and str.isdigit() and str != "0"
+        return str.isdigit() and str != "0"
 
+    # similar to constructPuzzle() but instead of prompting the user, it scrapes from the user edited grid interface
     def createPuzzleFromGrid(self):
         puzzle = list()
         # get a list of all blocks
@@ -99,6 +101,8 @@ class Interface(wx.Frame):
                         lastThreeRows.append(Cell())
             puzzle.append(lastThreeRows)
         return puzzle
+
+    
 
 
 if  __name__    ==  "__main__":
