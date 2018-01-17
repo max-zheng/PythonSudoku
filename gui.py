@@ -51,10 +51,23 @@ class Interface(wx.Frame):
 
     # when solve is pressed, populate backend grid using user given values
     def onButton(self,event):
-        self.sudoku = Sudoku(self.createPuzzleFromGrid())
-        self.sudoku.printPuzzle()
-        self.sudoku.solve()
-        self.populateGridUsingPuzzle()
+        if self.size.GetChildren()[0].GetWindow().GetLabel() == "Solve":
+            self.sudoku = Sudoku(self.createPuzzleFromGrid())
+            self.sudoku.printPuzzle()
+            # no error message
+            self.sudoku.beforeSolveVisitKnownCells()
+            errorMessage = self.sudoku.checkForInvalidBoard()
+            if errorMessage == "":
+                self.sudoku.solve()
+                self.populateGridUsingPuzzle()
+                # change button label to "Solve another puzzle"
+                self.size.GetChildren()[0].GetWindow().SetLabel("Solve another puzzle?")
+            else:
+                self.size.GetChildren()[2].GetWindow().SetValue(errorMessage)
+        # else if it says "Solve another puzzle?"
+        else:
+            self.resetGrid()
+            self.size.GetChildren()[0].GetWindow().SetLabel("Solve")
 
     # checks if cell string is a digit from 1-9
     def isIntegerExcludingZero(self,str):
@@ -73,6 +86,7 @@ class Interface(wx.Frame):
                 for square in range(0 + squareCounter,3 + squareCounter):
                     number = blocks[block].GetWindow().size.GetChildren()[square].GetWindow()
                     if self.isIntegerExcludingZero(number.GetValue()):
+                        # change color to blue because it is a given
                         number.SetForegroundColour(wx.BLUE)
                         firstThreeRows.append(Cell(int(number.GetValue())))
                     else:
@@ -147,9 +161,17 @@ class Interface(wx.Frame):
             sudokuCol = 0
             sudokuRow += 1
 
+    # reset the grid back all empty cells
+    def resetGrid(self):
+
+        blocks = self.size.GetChildren()[1].GetWindow().sz.GetChildren()
+        for block in blocks:
+            for square in block.GetWindow().size.GetChildren():
+                square.GetWindow().SetValue("")
+                square.GetWindow().SetEditable(True)
+
+# runs the program
 if  __name__    ==  "__main__":
-    a   =   wx.App(redirect=False)
-    # f1 = wx.Frame(None,-1)
-    # f   =   MyCustomPanel(f1,-1)
-    i = Interface()
-    a.MainLoop()
+    app   =   wx.App(redirect=False)
+    gui = Interface()
+    app.MainLoop()

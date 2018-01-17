@@ -87,19 +87,23 @@ class Sudoku:
     def checkForInvalidBoard(self):
         # check for condition of insufficient givens
         if self.knownSquares < 17:
-            print "Cannot solve puzzle. Insufficient givens. Puzzle must start with at least 17 known values for it to have one unique solution."
-            self.printPuzzle()
-            sys.exit(0)
+            return "Cannot solve puzzle. Insufficient givens. Puzzle must start with at least 17 known values for it to have one unique solution."
         # check for condition of duplicate givens in any row, col, or grid
         if self.isThereDuplicateGiven():
-            print "Cannot solve puzzle. Duplicate given. Either a row, column, or grid has 2 of the same value."
-            self.printPuzzle()
-            sys.exit(0)
+            return "Cannot solve puzzle. Duplicate given. Either a row, column, or grid has 2 of the same value."
         # check if any cell has no possible candidates
         if self.isThereNoPossibleCandidates():
-            print "Cannot solve puzzle. At least one cell has no possible candidates."
+            return "Cannot solve puzzle. At least one cell has no possible candidates."
+        # no error found
+        else:
+            return ""
+    def isBoardValid(self):
+        errorMessage = self.checkForInvalidBoard()
+        if errorMessage != "":
+            print errorMessage
             self.printPuzzle()
             sys.exit(0)
+        return True
 
     def isThereDuplicateGiven(self):
         hasDuplicate = False
@@ -172,10 +176,12 @@ class Sudoku:
                         noPossibleCandidates = True
         return noPossibleCandidates
 
+    def validateBoard(self):
+        self.beforeSolveVisitKnownCells()
+        self.isBoardValid()
+
     def solve(self):
 
-        self.beforeSolveVisitKnownCells()
-        self.checkForInvalidBoard()
         while(self.knownSquares < 81):
             puzzleUpdated = False
             # iterate through 9x9 grid
