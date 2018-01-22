@@ -34,7 +34,7 @@ class Interface(wx.Frame):
         button = wx.Button(self,label="Solve")
         button.Bind(wx.EVT_BUTTON, self.onButton)
         grid = SudokuGrid(self)
-        textValue = "\n\nPlease fill in the givens"
+        textValue = "\n\nPlease fill in the givens with values 1-9"
         textbox = wx.TextCtrl(self,value=textValue,style=wx.TE_READONLY | wx.TE_MULTILINE | wx.ALIGN_CENTER)
 
         self.size = wx.BoxSizer(wx.VERTICAL)
@@ -60,12 +60,14 @@ class Interface(wx.Frame):
                 self.populateGridUsingPuzzle()
                 # change button label to "Solve another puzzle"
                 self.size.GetChildren()[0].GetWindow().SetLabel("Solve another puzzle?")
+                self.size.GetChildren()[2].GetWindow().SetValue("\n\nSolved!")
             else:
                 self.size.GetChildren()[2].GetWindow().SetValue("\n\n" + errorMessage)
         # else if it says "Solve another puzzle?"
         else:
             self.resetGrid()
             self.size.GetChildren()[0].GetWindow().SetLabel("Solve")
+            self.size.GetChildren()[2].GetWindow().SetValue("\n\nPlease fill in the givens with values 1-9")
 
     # checks if cell string is a digit from 1-9
     def isIntegerExcludingZero(self,str):
@@ -170,6 +172,6 @@ class Interface(wx.Frame):
 
 # runs the program
 if  __name__    ==  "__main__":
-    app   =   wx.App(redirect=False)
+    app = wx.App(redirect=False)
     gui = Interface()
     app.MainLoop()
