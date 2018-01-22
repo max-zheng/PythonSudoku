@@ -97,6 +97,7 @@ class Sudoku:
         # no error found
         else:
             return ""
+
     def isBoardValid(self):
         errorMessage = self.checkForInvalidBoard()
         if errorMessage != "":
@@ -176,10 +177,6 @@ class Sudoku:
                         noPossibleCandidates = True
         return noPossibleCandidates
 
-    def validateBoard(self):
-        self.beforeSolveVisitKnownCells()
-        self.isBoardValid()
-
     def solve(self):
 
         while(self.knownSquares < 81):
@@ -238,7 +235,7 @@ class Sudoku:
                     index[1] = col
         return index
 
-    # prints the current state of the puzzle
+    # prints the current state of the puzzle in the console
     def printPuzzle(self):
         # for formatting
         rowCounter = 0

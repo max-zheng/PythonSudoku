@@ -1,5 +1,6 @@
 from sudoku import Sudoku
 
 game = Sudoku()
-game.validateBoard()
+game.beforeSolveVisitKnownCells()
+game.isBoardValid()
 game.solve()
